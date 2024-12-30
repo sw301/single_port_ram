@@ -1,0 +1,48 @@
+module single_port_ram_tb;
+
+    
+    parameter DATA_WIDTH = 8;
+    parameter ADDR_WIDTH = 4;
+
+    // Signals
+    reg clk;                             
+    reg we;                             
+    reg [ADDR_WIDTH-1:0] addr;           
+    reg [DATA_WIDTH-1:0] din;          
+    wire [DATA_WIDTH-1:0] dout;         
+
+    // Instantiate RAM
+    single_port_ram #(DATA_WIDTH, ADDR_WIDTH) ram_inst (
+        .clk(clk),
+        .we(we),
+        .addr(addr),
+        .din(din),
+        .dout(dout)
+    );
+
+    // Clock generation
+    always #5 clk = ~clk; 
+
+    initial begin
+        // Initialize signals
+        clk = 0;
+        we = 0;
+        addr = 0;
+        din = 0;
+
+        // Write data to RAM
+        we = 1; // Enable write
+        addr = 4'b0001; din = 8'hA5; #10;  
+        addr = 4'b0010; din = 8'h5A; #10;  
+
+        // Read data from RAM
+        we = 0; // Disable write
+        addr = 4'b0001; #10;                
+        $display("Read Data at Address 1: %h", dout);
+
+        addr = 4'b0010; #10;               
+        $display("Read Data at Address 2: %h", dout);
+
+        $finish; 
+    end
+endmodule
